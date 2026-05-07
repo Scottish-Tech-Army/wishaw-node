@@ -1,0 +1,1659 @@
+---
+openapi: 3.1.0
+paths:
+  /admin/centre/submissions:
+    get:
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+          default: SUBMITTED
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmissionsResponse"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Centre Submissions
+      tags:
+      - Admin Resource
+      security:
+      - BasicAuth:
+        - COACH
+        - ADMIN
+  /admin/centre/users:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsersResponse"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Centre Users
+      tags:
+      - Admin Resource
+      security:
+      - BasicAuth:
+        - COACH
+        - ADMIN
+  /admin/submissions/{submissionId}/approve:
+    post:
+      parameters:
+      - name: submissionId
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmitChallengeResponse"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Approve
+      tags:
+      - Admin Resource
+      security:
+      - BasicAuth:
+        - COACH
+        - ADMIN
+  /admin/submissions/{submissionId}/reject:
+    post:
+      parameters:
+      - name: submissionId
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmitChallengeResponse"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Reject
+      tags:
+      - Admin Resource
+      security:
+      - BasicAuth:
+        - COACH
+        - ADMIN
+  /auth/login:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Login
+      tags:
+      - Auth Resource
+  /auth/logout:
+    post:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Logout
+      tags:
+      - Auth Resource
+      security:
+      - BasicAuth:
+        - PLAYER
+        - PARENT
+        - COACH
+        - ADMIN
+  /auth/me:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Me
+      tags:
+      - Auth Resource
+      security:
+      - BasicAuth:
+        - PLAYER
+        - PARENT
+        - COACH
+        - ADMIN
+  /hello:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+      summary: Hello
+      tags:
+      - Greeting Resource
+  /leaderboards/centre:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeaderboardResponse"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Centre Leaderboard
+      tags:
+      - Leaderboard Resource
+      security:
+      - BasicAuth:
+        - PLAYER
+        - PARENT
+        - COACH
+        - ADMIN
+  /leaderboards/global:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeaderboardResponse"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Global Leaderboard
+      tags:
+      - Leaderboard Resource
+      security:
+      - BasicAuth:
+        - PLAYER
+        - PARENT
+        - COACH
+        - ADMIN
+  /manage/badge-categories:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BadgeCategory"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: List
+      tags:
+      - Badge Category Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBadgeCategoryRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Create
+      tags:
+      - Badge Category Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+  /manage/badge-categories/{id}:
+    put:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBadgeCategoryRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadgeCategory"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Update
+      tags:
+      - Badge Category Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadgeCategory"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Get
+      tags:
+      - Badge Category Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+  /manage/centres:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Centre"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: List
+      tags:
+      - Centre Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCentreRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Create
+      tags:
+      - Centre Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+  /manage/centres/{id}:
+    put:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCentreRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Centre"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Update
+      tags:
+      - Centre Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Centre"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Get
+      tags:
+      - Centre Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+  /manage/challenges:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChallengeDto"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: List
+      tags:
+      - Challenge Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateChallengeRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Create
+      tags:
+      - Challenge Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+  /manage/challenges/{id}:
+    put:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateChallengeRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChallengeDto"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Update
+      tags:
+      - Challenge Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChallengeDto"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Get
+      tags:
+      - Challenge Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+  /manage/games:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Game"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: List
+      tags:
+      - Game Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGameRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Create
+      tags:
+      - Game Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+  /manage/games/{id}:
+    put:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateGameRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Game"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Update
+      tags:
+      - Game Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Game"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Get
+      tags:
+      - Game Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+  /manage/level-definitions:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LevelDefinition"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: List
+      tags:
+      - Level Definition Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLevelDefinitionRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Create
+      tags:
+      - Level Definition Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+  /manage/level-definitions/{id}:
+    put:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateLevelDefinitionRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LevelDefinition"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Update
+      tags:
+      - Level Definition Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LevelDefinition"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Get
+      tags:
+      - Level Definition Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+  /manage/metadata:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Metadata"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: List
+      tags:
+      - Metadata Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMetadataRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Create
+      tags:
+      - Metadata Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+  /manage/metadata/{id}:
+    put:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMetadataRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Metadata"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Update
+      tags:
+      - Metadata Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Metadata"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Get
+      tags:
+      - Metadata Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+  /manage/modules:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ManageModuleDto"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: List
+      tags:
+      - Module Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateModuleRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Create
+      tags:
+      - Module Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+  /manage/modules/{id}:
+    put:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateModuleRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManageModuleDto"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Update
+      tags:
+      - Module Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManageModuleDto"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Get
+      tags:
+      - Module Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+  /manage/submissions:
+    get:
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SubmissionDto"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: List
+      tags:
+      - Challenge Submission Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+  /manage/submissions/{id}:
+    put:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmissionDto"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Update
+      tags:
+      - Challenge Submission Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmissionDto"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Get
+      tags:
+      - Challenge Submission Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+  /manage/users:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserDto"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: List
+      tags:
+      - User Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Create
+      tags:
+      - User Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+  /manage/users/{id}:
+    put:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDto"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Update
+      tags:
+      - User Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDto"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Get
+      tags:
+      - User Resource
+      security:
+      - BasicAuth:
+        - ADMIN
+  /me/badges:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadgesResponse"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Badges
+      tags:
+      - Player Resource
+      security:
+      - BasicAuth:
+        - PLAYER
+        - PARENT
+        - COACH
+        - ADMIN
+  /me/challenges/{challengeId}/submit:
+    post:
+      parameters:
+      - name: challengeId
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitChallengeRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmitChallengeResponse"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Submit Challenge
+      tags:
+      - Player Resource
+      security:
+      - BasicAuth:
+        - PLAYER
+        - PARENT
+        - COACH
+        - ADMIN
+  /me/modules:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModulesResponse"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Modules
+      tags:
+      - Player Resource
+      security:
+      - BasicAuth:
+        - PLAYER
+        - PARENT
+        - COACH
+        - ADMIN
+  /me/profile:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileResponse"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Profile
+      tags:
+      - Player Resource
+      security:
+      - BasicAuth:
+        - PLAYER
+        - PARENT
+        - COACH
+        - ADMIN
+components:
+  schemas:
+    BadgeCategory:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        displayName:
+          type: string
+        description:
+          type: string
+    BadgeDto:
+      type: object
+      properties:
+        badgeCategory:
+          type: string
+        xp:
+          type: integer
+          format: int32
+        level:
+          type: string
+        nextLevelAtXp:
+          type: integer
+          format: int32
+    BadgesResponse:
+      type: object
+      properties:
+        badges:
+          type: array
+          items:
+            $ref: "#/components/schemas/BadgeDto"
+    Centre:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        active:
+          type: boolean
+    ChallengeDto:
+      type: object
+      properties:
+        challengeId:
+          $ref: "#/components/schemas/UUID"
+        moduleId:
+          $ref: "#/components/schemas/UUID"
+        badgeCategoryId:
+          $ref: "#/components/schemas/UUID"
+        displayName:
+          type: string
+        description:
+          type: string
+        xpValue:
+          type: integer
+          format: int32
+    CreateBadgeCategoryRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+        description:
+          type: string
+    CreateCentreRequest:
+      type: object
+      properties:
+        name:
+          type: string
+    CreateChallengeRequest:
+      type: object
+      properties:
+        moduleId:
+          $ref: "#/components/schemas/UUID"
+        metadataId:
+          $ref: "#/components/schemas/UUID"
+        displayName:
+          type: string
+        description:
+          type: string
+        badgeCategoryId:
+          $ref: "#/components/schemas/UUID"
+        xpValue:
+          type: integer
+          format: int32
+    CreateGameRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+    CreateLevelDefinitionRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        minXp:
+          type: integer
+          format: int32
+        maxXp:
+          type: integer
+          format: int32
+    CreateMetadataRequest:
+      type: object
+      properties:
+        icon:
+          type: string
+        link:
+          type: string
+    CreateModuleRequest:
+      type: object
+      properties:
+        metadataId:
+          $ref: "#/components/schemas/UUID"
+        displayName:
+          type: string
+        description:
+          type: string
+        gameId:
+          $ref: "#/components/schemas/UUID"
+    CreateUserRequest:
+      type: object
+      properties:
+        centreId:
+          $ref: "#/components/schemas/UUID"
+        metadataId:
+          $ref: "#/components/schemas/UUID"
+        parentId:
+          $ref: "#/components/schemas/UUID"
+        username:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+    Game:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        displayName:
+          type: string
+        active:
+          type: boolean
+    LeaderboardResponse:
+      type: object
+      properties:
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/LeaderboardRow"
+    LeaderboardRow:
+      type: object
+      properties:
+        rank:
+          type: integer
+          format: int32
+        username:
+          type: string
+        displayName:
+          type: string
+        totalXp:
+          type: integer
+          format: int32
+        centreName:
+          type: string
+    LevelDefinition:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        minXp:
+          type: integer
+          format: int32
+        maxXp:
+          type: integer
+          format: int32
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    LoginResponse:
+      type: object
+      properties:
+        userId:
+          $ref: "#/components/schemas/UUID"
+        username:
+          type: string
+        role:
+          type: string
+        centreId:
+          $ref: "#/components/schemas/UUID"
+        displayName:
+          type: string
+    ManageModuleDto:
+      type: object
+      properties:
+        moduleId:
+          $ref: "#/components/schemas/UUID"
+        gameId:
+          $ref: "#/components/schemas/UUID"
+        displayName:
+          type: string
+        description:
+          type: string
+        active:
+          type: boolean
+    Metadata:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        icon:
+          type: string
+        link:
+          type: string
+    ModuleDto:
+      type: object
+      properties:
+        moduleId:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        game:
+          type: string
+        progress:
+          $ref: "#/components/schemas/ModuleProgressDto"
+    ModuleProgressDto:
+      type: object
+      properties:
+        approved:
+          type: integer
+          format: int32
+        total:
+          type: integer
+          format: int32
+    ModulesResponse:
+      type: object
+      properties:
+        modules:
+          type: array
+          items:
+            $ref: "#/components/schemas/ModuleDto"
+    ProfileResponse:
+      type: object
+      properties:
+        userId:
+          $ref: "#/components/schemas/UUID"
+        displayName:
+          type: string
+        avatarUrl:
+          type: string
+    ReviewRequest:
+      type: object
+      properties:
+        reviewerComment:
+          type: string
+    SubmissionDto:
+      type: object
+      properties:
+        submissionId:
+          $ref: "#/components/schemas/UUID"
+        challengeId:
+          $ref: "#/components/schemas/UUID"
+        challengeName:
+          type: string
+        username:
+          type: string
+        displayName:
+          type: string
+        noteText:
+          type: string
+        submittedAt:
+          type: string
+    SubmissionsResponse:
+      type: object
+      properties:
+        submissions:
+          type: array
+          items:
+            $ref: "#/components/schemas/SubmissionDto"
+    SubmitChallengeRequest:
+      type: object
+      properties:
+        noteText:
+          type: string
+    SubmitChallengeResponse:
+      type: object
+      properties:
+        submissionId:
+          $ref: "#/components/schemas/UUID"
+        status:
+          type: string
+    UUID:
+      type: string
+      format: uuid
+      pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+    UpdateBadgeCategoryRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+        description:
+          type: string
+    UpdateCentreRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        active:
+          type: boolean
+    UpdateChallengeRequest:
+      type: object
+      properties:
+        metadataId:
+          $ref: "#/components/schemas/UUID"
+        displayName:
+          type: string
+        description:
+          type: string
+        badgeCategoryId:
+          $ref: "#/components/schemas/UUID"
+        xpValue:
+          type: integer
+          format: int32
+    UpdateGameRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+        active:
+          type: boolean
+    UpdateLevelDefinitionRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        minXp:
+          type: integer
+          format: int32
+        maxXp:
+          type: integer
+          format: int32
+    UpdateMetadataRequest:
+      type: object
+      properties:
+        icon:
+          type: string
+        link:
+          type: string
+    UpdateModuleRequest:
+      type: object
+      properties:
+        metadataId:
+          $ref: "#/components/schemas/UUID"
+        displayName:
+          type: string
+        description:
+          type: string
+        gameId:
+          $ref: "#/components/schemas/UUID"
+        active:
+          type: boolean
+    UpdateUserRequest:
+      type: object
+      properties:
+        metadataId:
+          $ref: "#/components/schemas/UUID"
+        parentId:
+          $ref: "#/components/schemas/UUID"
+        role:
+          type: string
+        active:
+          type: boolean
+        password:
+          type: string
+    UserDto:
+      type: object
+      properties:
+        userId:
+          $ref: "#/components/schemas/UUID"
+        centreId:
+          $ref: "#/components/schemas/UUID"
+        username:
+          type: string
+        displayName:
+          type: string
+        role:
+          type: string
+        active:
+          type: boolean
+    UsersResponse:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserDto"
+  securitySchemes:
+    BasicAuth:
+      description: Authentication
+      type: http
+      scheme: basic
+info:
+  title: Wishaw YMCA Esports API
+  version: 1.0.0
+  description: Backend API for the Wishaw YMCA Esports Login App
+servers:
+- url: http://localhost:8080
+  description: Auto generated value
+- url: http://0.0.0.0:8080
+  description: Auto generated value

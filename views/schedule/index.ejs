@@ -1,0 +1,53 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar page-shell">
+  <div class="page-header">
+    <div>
+      <h1>📅 Session Map</h1>
+      <p>Keep the weekly rhythm visible so staff, centres, and players all know where the energy is landing.</p>
+    </div>
+    <a href="/schedule/create" class="btn btn-primary">+ Add Session</a>
+  </div>
+  <%- include('../partials/flash') %>
+  <form method="GET" action="/schedule" class="filter-bar">
+    <select name="centreId" onchange="this.form.submit()">
+      <option value="">All Centres</option>
+      <% centres.forEach(function(c) { %>
+        <option value="<%= c.id %>" <%= selectedCentreId == c.id ? 'selected' : '' %>><%= c.name %></option>
+      <% }); %>
+    </select>
+  </form>
+  <% if (items.length === 0) { %>
+    <div class="empty-state">
+      <strong>No sessions are scheduled yet.</strong>
+      <p>Add the first session block to start shaping a reliable weekly cadence.</p>
+    </div>
+  <% } else { %>
+    <p class="table-note">This view shows the rhythm of the week at a glance, ordered day by day.</p>
+    <table class="data-table">
+      <thead><tr><th>Day</th><th>Time</th><th>Module</th><th>Centre</th><th>Actions</th></tr></thead>
+      <tbody>
+        <% var days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']; %>
+        <% days.forEach(function(day) { %>
+          <% var dayItems = items.filter(function(i) { return i.dayOfWeek === day; }); %>
+          <% dayItems.forEach(function(item) { %>
+            <tr>
+              <td><strong><%= item.dayOfWeek %></strong></td>
+              <td><%= item.startTime %> - <%= item.endTime %></td>
+              <td><%= item.moduleName %></td>
+              <td><%= item.centreName %></td>
+              <td class="actions">
+                <a href="/schedule/<%= item.id %>/edit" class="btn btn-sm btn-secondary">Edit</a>
+                <form method="POST" action="/schedule/<%= item.id %>/delete" class="inline-form" onsubmit="return confirm('Delete this schedule item?')">
+                  <%- include('../partials/csrf') %>
+                  <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                </form>
+              </td>
+            </tr>
+          <% }); %>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } %>
+</main>
+<%- include('../partials/footer') %>

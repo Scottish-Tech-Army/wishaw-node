@@ -1,0 +1,155 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar page-shell">
+  <section class="page-hero">
+    <div class="page-hero-grid page-hero-grid-profile">
+      <div class="page-hero-content">
+        <span class="eyebrow">Player Journey</span>
+        <h1>👤 My Journey</h1>
+        <p class="page-hero-intro">This is your player card, progress board, and badge story in one place. Use it to see what is already recognised and what still feels within reach.</p>
+        <div class="page-chip-row">
+          <div class="page-chip">
+            <span>Total Points</span>
+            <strong><%= progress ? progress.totalXp : 0 %> XP</strong>
+          </div>
+          <div class="page-chip">
+            <span>Group</span>
+            <strong><%= player && player.groupName ? player.groupName : '—' %></strong>
+          </div>
+          <div class="page-chip">
+            <span>Centre</span>
+            <strong><%= player && player.centreName ? player.centreName : '—' %></strong>
+          </div>
+        </div>
+      </div>
+      <div class="page-hero-panel player-showcase">
+        <%- include('../partials/player-media', { player: player || currentUser, size: 'xl', shape: player && player.profileImageKind === 'avatar' ? 'circle' : 'panel' }) %>
+        <div class="player-showcase-copy">
+          <h2><%= currentUser.displayName %></h2>
+          <p>Your account view keeps your points, progress, and recent recognition easy to read without any admin clutter.</p>
+          <div class="stack-compact">
+            <span class="badge badge-<%= currentUser.role.toLowerCase() %>"><%= currentUser.role.replace('_', ' ') %></span>
+            <span class="info-pill"><span><%= useMock ? 'Email' : 'Username' %></span><strong><%= currentUser.username || currentUser.email %></strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <% if (player && progress) { %>
+    <div class="profile-info card profile-overview-card">
+      <div class="profile-summary-grid">
+        <div class="profile-summary-item">
+          <span>Group</span>
+          <strong><%= player.groupName || '—' %></strong>
+        </div>
+        <div class="profile-summary-item">
+          <span>Centre</span>
+          <strong><%= player.centreName || '—' %></strong>
+        </div>
+        <div class="profile-summary-item">
+          <span>Profile Media</span>
+          <strong><%= player.avatarUrl ? 'Avatar ready' : player.imageUrl ? 'Image ready' : 'No upload yet' %></strong>
+        </div>
+      </div>
+    </div>
+
+    <% if (useMock && enrolledModules && enrolledModules.length > 0) { %>
+      <div class="section-heading">
+        <h2>Current Modules</h2>
+        <p>These are the badge pathways already active in your journey right now.</p>
+      </div>
+      <div class="badge-grid">
+        <% enrolledModules.forEach(function(m) { %>
+          <% var isCompleted = completedModules && completedModules.some(function(cm) { return cm.id === m.id; }); %>
+          <div class="card" style="border-left: 4px solid <%= isCompleted ? '#2ecc71' : '#3498db' %>">
+            <h3><%= m.name %> <% if (isCompleted) { %><span class="badge" style="background: #2ecc71">Completed</span><% } %></h3>
+            <p><%= m.description %></p>
+          </div>
+        <% }); %>
+      </div>
+    <% } %>
+
+    <div class="section-heading">
+      <h2>My Badge Progress</h2>
+      <p>Each category reflects the points and recognition already earned across the programme.</p>
+    </div>
+    <% if (useMock) { %>
+      <div class="badge-grid">
+        <% badgeCategories.forEach(function(cat) { %>
+          <% var catData = progress.byCategory[cat.id]; %>
+          <div class="badge-card" style="border-top: 4px solid <%= cat.color %>">
+            <div class="badge-card-header">
+              <span class="badge-icon"><%= cat.icon %></span>
+              <h3><%= cat.name %></h3>
+            </div>
+            <div class="badge-points"><%= catData ? catData.points : 0 %> pts</div>
+            <div class="badge-progress-bar">
+              <div class="badge-progress-fill" style="width: <%= Math.min(100, ((catData ? catData.points : 0) / 500) * 100) %>%; background: <%= cat.color %>"></div>
+            </div>
+            <% if (catData && catData.awards.length > 0) { %>
+              <ul class="badge-awards">
+                <% catData.awards.forEach(function(a) { %>
+                  <li><%= a.challengeName %> — <strong><%= a.pointsAwarded %> pts</strong></li>
+                <% }); %>
+              </ul>
+            <% } else { %>
+              <p class="empty-text">No awards have landed here yet.</p>
+            <% } %>
+          </div>
+        <% }); %>
+      </div>
+
+      <div class="section-heading">
+        <h2>Recent Awards</h2>
+        <p>The latest recognised moments appear first so it is easy to spot recent momentum.</p>
+      </div>
+      <% if (progress.awards.length === 0) { %>
+        <div class="empty-state">
+          <strong>No awards yet.</strong>
+          <p>Once recognised progress starts to land, it will appear here first.</p>
+        </div>
+      <% } else { %>
+        <table class="data-table">
+          <thead><tr><th>Challenge</th><th>Module</th><th>Category</th><th>Points</th><th>Date</th></tr></thead>
+          <tbody>
+            <% progress.awards.sort(function(a,b) { return b.awardedAt.localeCompare(a.awardedAt); }).forEach(function(a) { %>
+              <% var cat = badgeCategories.find(function(c) { return c.id === a.badgeCategory; }); %>
+              <tr>
+                <td><%= a.challengeName %></td>
+                <td><%= a.moduleName %></td>
+                <td><span class="badge" style="background: <%= cat ? cat.color : '#ccc' %>"><%= cat ? cat.name : a.badgeCategory %></span></td>
+                <td><strong><%= a.pointsAwarded %></strong></td>
+                <td><%= a.awardedAt %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } %>
+    <% } %>
+    <% if (!useMock) { %>
+      <% if (!progress.categories || progress.categories.length === 0) { %>
+        <div class="empty-state">
+          <strong>No badge progress has been recorded yet.</strong>
+          <p>This live record will fill in as soon as recognised activity reaches the service.</p>
+        </div>
+      <% } else { %>
+        <table class="data-table">
+          <thead><tr><th>Category</th><th>Legacy</th><th>Earned</th><th>Total</th><th>Level</th></tr></thead>
+          <tbody>
+            <% progress.categories.forEach(function(category) { %>
+              <tr>
+                <td><strong><%= category.name %></strong></td>
+                <td><%= category.legacyPoints %></td>
+                <td><%= category.earnedPoints %></td>
+                <td><strong><%= category.points %></strong></td>
+                <td><%= category.currentLevel || '—' %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } %>
+    <% } %>
+  <% } %>
+</main>
+<%- include('../partials/footer') %>

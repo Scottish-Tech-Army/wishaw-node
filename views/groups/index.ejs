@@ -1,0 +1,51 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar page-shell">
+  <div class="page-header">
+    <div>
+      <h1>👥 Squads</h1>
+      <p>Organise players into groups that feel intentional, balanced, and ready for each session.</p>
+    </div>
+    <a href="/groups/create" class="btn btn-primary">+ Create Squad</a>
+  </div>
+  <%- include('../partials/flash') %>
+  <form method="GET" action="/groups" class="filter-bar">
+    <select name="centreId" onchange="this.form.submit()">
+      <option value="">All Centres</option>
+      <% centres.forEach(function(c) { %>
+        <option value="<%= c.id %>" <%= selectedCentreId == c.id ? 'selected' : '' %>><%= c.name %></option>
+      <% }); %>
+    </select>
+  </form>
+  <% if (groups.length === 0) { %>
+    <div class="empty-state">
+      <strong>No squads are live yet.</strong>
+      <p>Create a group for a centre to start shaping rosters around age bands and game focus.</p>
+    </div>
+  <% } else { %>
+    <p class="table-note">Filter by centre when you want a tighter view of the squads running at one location.</p>
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Game</th><th>Centre</th><th>Age Band</th><th>Actions</th></tr></thead>
+      <tbody>
+        <% groups.forEach(function(g) { %>
+          <tr>
+            <td><%= g.name %></td>
+            <td><%= g.gameName || '—' %></td>
+            <td><%= g.centreName %></td>
+            <td><%= g.ageBand || g.ageRange %></td>
+            <td class="actions">
+              <a href="/groups/<%= g.id %>/edit" class="btn btn-sm btn-secondary">Edit</a>
+              <% if (useMock) { %>
+                <form method="POST" action="/groups/<%= g.id %>/delete" class="inline-form" onsubmit="return confirm('Delete this group?')">
+                  <%- include('../partials/csrf') %>
+                  <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                </form>
+              <% } %>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } %>
+</main>
+<%- include('../partials/footer') %>

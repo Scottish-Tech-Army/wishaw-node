@@ -1,0 +1,46 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar page-shell">
+  <div class="page-header">
+    <div>
+      <h1>👨‍👩‍👧 Family View</h1>
+      <p>A calm read-only space for checking how each child is progressing without getting lost in admin detail.</p>
+    </div>
+    <p class="read-only-notice">📖 Read-only access</p>
+  </div>
+
+  <div class="story-panel story-panel-compact">
+    <h2>Welcome, <%= currentUser.displayName %>.</h2>
+    <p>Your linked children appear below with a direct route into their progress, recent recognition, and total points.</p>
+  </div>
+
+  <% if (children.length === 0) { %>
+    <div class="empty-state">
+      <strong>No linked children yet.</strong>
+      <p>If this view should already show a child, contact an administrator to set up the family link.</p>
+    </div>
+  <% } else { %>
+    <div class="card-grid">
+      <% children.forEach(function(child) { %>
+        <a href="/parent/child/<%= child.id %>" class="dash-card">
+          <div class="player-card-identity">
+            <%- include('../partials/player-media', { player: child, size: 'md', shape: child.profileImageKind === 'avatar' ? 'circle' : 'panel' }) %>
+            <div>
+              <span class="dash-label"><%= child.displayName %></span>
+              <% if (child.groupName) { %>
+                <span class="dash-sub"><%= child.groupName %></span>
+              <% } %>
+            </div>
+          </div>
+          <% if (child.groupName) { %>
+            <span class="dash-sub"><%= child.centreName || 'Academy player' %></span>
+          <% } %>
+          <% if (child.xp !== undefined) { %>
+            <span class="dash-count"><%= child.xp %> XP</span>
+          <% } %>
+        </a>
+      <% }); %>
+    </div>
+  <% } %>
+</main>
+<%- include('../partials/footer') %>

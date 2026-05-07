@@ -1,0 +1,26 @@
+<%
+  var mediaPlayer = typeof player !== 'undefined' ? player : null;
+  var mediaSize = typeof size !== 'undefined' ? size : 'md';
+  var mediaShape = typeof shape !== 'undefined'
+    ? shape
+    : (mediaPlayer && mediaPlayer.profileImageKind === 'avatar' ? 'circle' : 'panel');
+  var mediaUrl = mediaPlayer && mediaPlayer.profileImageUrl
+    ? mediaPlayer.profileImageUrl
+    : mediaPlayer && (mediaPlayer.avatarUrl || mediaPlayer.imageUrl)
+      ? (mediaPlayer.avatarUrl || mediaPlayer.imageUrl)
+      : null;
+  var mediaLabel = mediaPlayer && mediaPlayer.displayName ? mediaPlayer.displayName : 'Player';
+  var mediaInitials = mediaLabel
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(function (part) { return part.charAt(0).toUpperCase(); })
+    .join('') || '?';
+%>
+<span class="player-media player-media-<%= mediaSize %> player-media-<%= mediaShape %><%= mediaUrl ? '' : ' is-empty' %>">
+  <% if (mediaUrl) { %>
+    <img src="<%= mediaUrl %>" alt="<%= mediaLabel %> profile image" loading="lazy">
+  <% } else { %>
+    <span class="player-media-fallback"><%= mediaInitials %></span>
+  <% } %>
+</span>

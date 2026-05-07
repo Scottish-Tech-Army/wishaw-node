@@ -1,0 +1,58 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar page-shell">
+  <div class="page-header">
+    <div>
+      <h1>🏢 Centres</h1>
+      <p>Keep each academy location clear, current, and ready for players, staff, and families.</p>
+    </div>
+    <% if (currentUser && currentUser.role === 'SUPER_ADMIN') { %>
+      <a href="/centres/create" class="btn btn-primary">+ Add Centre</a>
+    <% } %>
+  </div>
+  <%- include('../partials/flash') %>
+  <% if (currentUser && currentUser.role === 'CENTRE_ADMIN') { %>
+    <div class="flash flash-info">Centre admins can review the wider network here, while super admins keep ownership of creating and editing centre records.</div>
+  <% } %>
+  <% if (centres.length === 0) { %>
+    <div class="empty-state">
+      <strong>No centres have been set up yet.</strong>
+      <p>Create the first location to give players, squads, and schedules a proper home base.</p>
+    </div>
+  <% } else { %>
+    <p class="table-note">Every centre record acts as a backbone for groups, schedules, imports, and reporting.</p>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Code</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% centres.forEach(function(c) { %>
+          <tr>
+            <td><%= c.name %></td>
+            <td><code><%= c.code || c.location %></code></td>
+            <td><span class="status-badge status-<%= c.active ? 'active' : 'inactive' %>"><%= c.active ? 'Active' : 'Inactive' %></span></td>
+            <td class="actions">
+              <% if (currentUser && currentUser.role === 'SUPER_ADMIN') { %>
+                <a href="/centres/<%= c.id %>/edit" class="btn btn-sm btn-secondary">Edit</a>
+              <% } else { %>
+                <span class="status-badge status-warning">Read only</span>
+              <% } %>
+              <% if (useMock && currentUser && currentUser.role === 'SUPER_ADMIN') { %>
+                <form method="POST" action="/centres/<%= c.id %>/delete" class="inline-form" onsubmit="return confirm('Delete this centre?')">
+                  <%- include('../partials/csrf') %>
+                  <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                </form>
+              <% } %>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } %>
+</main>
+<%- include('../partials/footer') %>

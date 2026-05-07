@@ -1,0 +1,38 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar">
+  <div class="page-header">
+    <h1><%= group ? 'Edit Group' : 'Create Group' %></h1>
+    <a href="/groups" class="btn btn-secondary">← Back</a>
+  </div>
+  <% if (error) { %><div class="flash flash-error"><%= error %></div><% } %>
+  <form method="POST" action="<%= group ? '/groups/' + group.id + '/edit' : '/groups/create' %>" class="form card">
+    <%- include('../partials/csrf') %>
+    <div class="form-group">
+      <label for="name">Group Name</label>
+      <input type="text" id="name" name="name" value="<%= group ? group.name : '' %>" required>
+    </div>
+    <div class="form-group">
+      <label for="centreId">Centre</label>
+      <select id="centreId" name="centreId" required>
+        <option value="">Select centre...</option>
+        <% centres.forEach(function(c) { %>
+          <option value="<%= c.id %>" <%= group && group.centreId === c.id ? 'selected' : '' %>><%= c.name %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="gameName">Game Name</label>
+      <input type="text" id="gameName" name="gameName" value="<%= group ? group.gameName : '' %>" placeholder="e.g. Fortnite">
+    </div>
+    <div class="form-group">
+      <label for="ageBand">Age Band</label>
+      <input type="text" id="ageBand" name="ageBand" value="<%= group ? (group.ageBand || group.ageRange) : '' %>" placeholder="e.g. 10-14">
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary"><%= group ? 'Update Group' : 'Create Group' %></button>
+      <a href="/groups" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</main>
+<%- include('../partials/footer') %>

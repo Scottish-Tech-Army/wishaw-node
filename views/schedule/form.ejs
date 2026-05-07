@@ -1,0 +1,53 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar">
+  <div class="page-header">
+    <h1><%= item ? 'Edit Schedule Item' : 'Create Schedule Item' %></h1>
+    <a href="/schedule" class="btn btn-secondary">← Back</a>
+  </div>
+  <% if (error) { %><div class="flash flash-error"><%= error %></div><% } %>
+  <form method="POST" action="<%= item ? '/schedule/' + item.id + '/edit' : '/schedule/create' %>" class="form card">
+    <%- include('../partials/csrf') %>
+    <div class="form-group">
+      <label for="moduleId">Module</label>
+      <select id="moduleId" name="moduleId" required>
+        <option value="">Select module...</option>
+        <% modules.forEach(function(m) { %>
+          <option value="<%= m.id %>" <%= item && item.moduleId === m.id ? 'selected' : '' %>><%= m.name %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="centreId">Centre</label>
+      <select id="centreId" name="centreId" required>
+        <option value="">Select centre...</option>
+        <% centres.forEach(function(c) { %>
+          <option value="<%= c.id %>" <%= item && item.centreId === c.id ? 'selected' : '' %>><%= c.name %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="dayOfWeek">Day of Week</label>
+      <select id="dayOfWeek" name="dayOfWeek" required>
+        <% ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].forEach(function(d) { %>
+          <option value="<%= d %>" <%= item && item.dayOfWeek === d ? 'selected' : '' %>><%= d %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="startTime">Start Time</label>
+        <input type="time" id="startTime" name="startTime" value="<%= item ? item.startTime : '16:00' %>" required>
+      </div>
+      <div class="form-group">
+        <label for="endTime">End Time</label>
+        <input type="time" id="endTime" name="endTime" value="<%= item ? item.endTime : '17:30' %>" required>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary"><%= item ? 'Update' : 'Create' %> Schedule Item</button>
+      <a href="/schedule" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</main>
+<%- include('../partials/footer') %>

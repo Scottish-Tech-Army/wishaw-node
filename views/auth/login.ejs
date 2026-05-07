@@ -1,0 +1,85 @@
+<%- include('../partials/header') %>
+<main id="main-content" class="main-full login-page">
+  <div class="login-card">
+    <div class="login-stage">
+      <div class="login-brand">
+        <span class="brand-icon-lg">🎮</span>
+        <div>
+          <p class="eyebrow">Wishaw YMCA Esports</p>
+          <h1>Welcome back to the academy.</h1>
+          <p>Step into a calmer command space for sessions, progression, and recognition. Every view is built to make young players feel seen and every adult feel in control.</p>
+        </div>
+      </div>
+
+      <div class="login-highlights">
+        <div class="highlight-card">
+          <span class="highlight-label">Session Flow</span>
+          <strong>Run centres, squads, modules, and schedules without losing the human feel.</strong>
+        </div>
+        <div class="highlight-card">
+          <span class="highlight-label">Recognition</span>
+          <strong>Turn challenge wins, badge progress, and leaderboard movement into moments worth noticing.</strong>
+        </div>
+        <div class="highlight-card">
+          <span class="highlight-label">Shared Visibility</span>
+          <strong>Give staff, players, and families the right view of the same journey.</strong>
+        </div>
+      </div>
+
+      <div class="page-hero-panel">
+        <h2>Built like a game lobby, designed like a trusted programme.</h2>
+        <ul class="page-hero-list">
+          <li>Warm visuals to make sign-in feel inviting, not bureaucratic.</li>
+          <li>Clear status cues so staff can move quickly and confidently.</li>
+          <li>Progress language that celebrates effort without sounding childish.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="login-panel">
+      <div class="login-panel-head">
+        <span class="eyebrow">Sign in</span>
+        <h2>Good to see you again.</h2>
+        <p>Sign in to open your personalised view of the academy, whether you are running the programme, tracking progress, or supporting from home.</p>
+      </div>
+
+      <% if (error) { %>
+        <div class="flash flash-error"><%= error %></div>
+      <% } %>
+
+      <form method="POST" action="/login" class="form login-form-surface">
+        <%- include('../partials/csrf') %>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required placeholder="Enter your academy username" autofocus autocomplete="username" value="<%= username || '' %>">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required placeholder="Enter your password" autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Enter the Academy</button>
+      </form>
+
+      <div class="login-help">
+        <% if (!useMock) { %>
+          <div class="login-note">
+            <span class="status-badge status-warning">Live mode</span>
+            <span>Live sign-in depends on the connected backend service being awake and reachable.</span>
+          </div>
+          <p><strong>Need access?</strong></p>
+          <p>Use the account issued to you for the live service. If the door stays closed, check the backend connection first and then contact an administrator.</p>
+        <% } else { %>
+          <p><strong>Demo accounts for preview mode</strong></p>
+          <table class="demo-accounts">
+            <tr><td>Super Admin</td><td>superadmin / admin123</td></tr>
+            <tr><td>Centre Admin</td><td>centreadmin / admin123</td></tr>
+            <tr><td>Player</td><td>player1 / player123</td></tr>
+            <tr><td>Parent</td><td>parent1 / parent123</td></tr>
+          </table>
+          <p class="empty-text">Use these accounts to explore the experience from each role without affecting a live environment.</p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</main>
+<%- include('../partials/footer') %>

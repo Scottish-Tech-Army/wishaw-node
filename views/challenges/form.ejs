@@ -1,0 +1,51 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar">
+  <div class="page-header">
+    <h1><%= challenge ? 'Edit Challenge' : 'Create Challenge' %></h1>
+    <a href="/challenges" class="btn btn-secondary">← Back</a>
+  </div>
+  <% if (error) { %><div class="flash flash-error"><%= error %></div><% } %>
+  <form method="POST" action="<%= challenge ? '/challenges/' + challenge.id + '/edit' : '/challenges/create' %>" class="form card">
+    <%- include('../partials/csrf') %>
+    <div class="form-group">
+      <label for="name">Challenge Name</label>
+      <input type="text" id="name" name="name" value="<%= challenge ? challenge.name : '' %>" required>
+    </div>
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" name="description" rows="3" required><%= challenge ? challenge.description : '' %></textarea>
+    </div>
+    <div class="form-group">
+      <label for="moduleId">Module</label>
+      <select id="moduleId" name="moduleId" required>
+        <option value="">Select module...</option>
+        <% modules.forEach(function(m) { %>
+          <option value="<%= m.id %>" <%= challenge && challenge.moduleId === m.id ? 'selected' : '' %>><%= m.name %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="badgeCategory">Badge Category</label>
+      <select id="badgeCategory" name="badgeCategory" required>
+        <option value="">Select category...</option>
+        <% badgeCategories.forEach(function(c) { %>
+          <option value="<%= c.id %>" <%= challenge && challenge.badgeCategory === c.id ? 'selected' : '' %>><%= c.icon %> <%= c.name %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="points">Points</label>
+      <input type="number" id="points" name="points" value="<%= challenge ? challenge.points : 0 %>" min="0" required>
+    </div>
+    <div class="form-group">
+      <label for="skills">Skills (comma separated)</label>
+      <input type="text" id="skills" name="skills" value="<%= challenge && challenge.skills ? challenge.skills.join(', ') : '' %>" placeholder="e.g. communication, teamwork">
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary"><%= challenge ? 'Update Challenge' : 'Create Challenge' %></button>
+      <a href="/challenges" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</main>
+<%- include('../partials/footer') %>

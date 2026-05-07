@@ -1,0 +1,6 @@
+<% if (typeof success !== 'undefined' && success) { %>
+  <div class="flash flash-success"><%= success %></div>
+<% } %>
+<% if (typeof error !== 'undefined' && error && typeof error === 'string') { %>
+  <div class="flash flash-error"><%= error %></div>
+<% } %>

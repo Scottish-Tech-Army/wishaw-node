@@ -1,0 +1,51 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar page-shell">
+  <div class="page-header">
+    <div>
+      <h1>🏆 Challenge Board</h1>
+      <p>Create standout moments that reward teamwork, focus, and effort in language players can feel proud of.</p>
+    </div>
+    <a href="/challenges/create" class="btn btn-primary">+ Create Challenge</a>
+  </div>
+  <%- include('../partials/flash') %>
+  <form method="GET" action="/challenges" class="filter-bar">
+    <select name="moduleId" onchange="this.form.submit()">
+      <option value="">All Modules</option>
+      <% modules.forEach(function(m) { %>
+        <option value="<%= m.id %>" <%= selectedModuleId == m.id ? 'selected' : '' %>><%= m.name %></option>
+      <% }); %>
+    </select>
+  </form>
+  <% if (challenges.length === 0) { %>
+    <div class="empty-state">
+      <strong>No challenges are on the board yet.</strong>
+      <p>Add the first challenge to turn skills and effort into something visible and rewarding.</p>
+    </div>
+  <% } else { %>
+    <p class="table-note">Good challenges read clearly, reward the right behaviour, and connect naturally to a module path.</p>
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Module</th><th>Category</th><th>Points</th><th>Skills</th><th>Actions</th></tr></thead>
+      <tbody>
+        <% challenges.forEach(function(ch) { %>
+          <% var cat = badgeCategories.find(function(c) { return c.id === ch.badgeCategory; }); %>
+          <tr>
+            <td><strong><%= ch.name %></strong><br><small><%= ch.description %></small></td>
+            <td><%= modules.find(function(m) { return m.id === ch.moduleId; }) ? modules.find(function(m) { return m.id === ch.moduleId; }).name : '' %></td>
+            <td><span class="badge" style="background: <%= cat ? cat.color : '#ccc' %>"><%= cat ? cat.name : ch.badgeCategory %></span></td>
+            <td><strong><%= ch.points %></strong></td>
+            <td><%= ch.skills ? ch.skills.join(', ') : '' %></td>
+            <td class="actions">
+              <a href="/challenges/<%= ch.id %>/edit" class="btn btn-sm btn-secondary">Edit</a>
+              <form method="POST" action="/challenges/<%= ch.id %>/delete" class="inline-form" onsubmit="return confirm('Delete this challenge?')">
+                <%- include('../partials/csrf') %>
+                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } %>
+</main>
+<%- include('../partials/footer') %>

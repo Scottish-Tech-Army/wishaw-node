@@ -1,0 +1,118 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar page-shell">
+  <div class="page-header">
+    <div>
+      <h1>🎮 <%= player.displayName %>'s Progress</h1>
+      <p>A clear family view of recent recognition, badge movement, and overall points.</p>
+    </div>
+    <div class="page-header-actions">
+      <p class="read-only-notice">📖 Read-only view</p>
+      <a href="/parent/dashboard" class="btn btn-secondary">← Back to Family View</a>
+    </div>
+  </div>
+
+  <div class="profile-info card profile-overview-card">
+    <div class="player-card-identity player-card-identity-spacious">
+      <%- include('../partials/player-media', { player: player, size: 'lg', shape: player.profileImageKind === 'avatar' ? 'circle' : 'panel' }) %>
+      <div>
+        <span class="eyebrow">Player Snapshot</span>
+        <h2><%= player.displayName %></h2>
+        <p class="page-intro">This family view keeps the essentials in one place: where they train, how points are moving, and which badge tracks are already gaining shape.</p>
+      </div>
+    </div>
+    <div class="profile-summary-grid">
+      <div class="profile-summary-item">
+        <span>Group</span>
+        <strong><%= player.groupName || '—' %></strong>
+      </div>
+      <div class="profile-summary-item">
+        <span>Centre</span>
+        <strong><%= player.centreName || '—' %></strong>
+      </div>
+      <div class="profile-summary-item">
+        <span>Total Points</span>
+        <strong><span class="badge badge-xp"><%= progress.totalXp %></span></strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-heading">
+    <h2>Badge Progress</h2>
+    <p>Each category shows where your child is steadily building progress across the programme.</p>
+  </div>
+  <% if (useMock) { %>
+    <div class="badge-grid">
+      <% badgeCategories.forEach(function(cat) { %>
+        <% var catData = progress.byCategory[cat.id]; %>
+        <div class="badge-card" style="border-top: 4px solid <%= cat.color %>">
+          <div class="badge-card-header">
+            <span class="badge-icon"><%= cat.icon %></span>
+            <h3><%= cat.name %></h3>
+          </div>
+          <div class="badge-points"><%= catData ? catData.points : 0 %> pts</div>
+          <div class="badge-progress-bar">
+            <div class="badge-progress-fill" style="width: <%= Math.min(100, ((catData ? catData.points : 0) / 500) * 100) %>%; background: <%= cat.color %>"></div>
+          </div>
+          <% if (catData && catData.awards.length > 0) { %>
+            <ul class="badge-awards">
+              <% catData.awards.forEach(function(a) { %>
+                <li><%= a.challengeName %> — <strong><%= a.pointsAwarded %> pts</strong> <small>(<%= a.awardedAt %>)</small></li>
+              <% }); %>
+            </ul>
+          <% } else { %>
+            <p class="empty-text">No awards have appeared in this category yet.</p>
+          <% } %>
+        </div>
+      <% }); %>
+    </div>
+
+    <div class="section-heading">
+      <h2>Recent Awards</h2>
+      <p>The latest recognised moments appear here first.</p>
+    </div>
+    <% if (progress.awards.length === 0) { %>
+      <div class="empty-state">
+        <strong>No awards yet.</strong>
+        <p>As soon as challenges are awarded, this timeline will begin to fill in.</p>
+      </div>
+    <% } else { %>
+      <table class="data-table">
+        <thead><tr><th>Challenge</th><th>Module</th><th>Category</th><th>Points</th><th>Date</th></tr></thead>
+        <tbody>
+          <% progress.awards.sort(function(a,b) { return b.awardedAt.localeCompare(a.awardedAt); }).forEach(function(a) { %>
+            <% var cat = badgeCategories.find(function(c) { return c.id === a.badgeCategory; }); %>
+            <tr>
+              <td><%= a.challengeName %></td>
+              <td><%= a.moduleName %></td>
+              <td><span class="badge" style="background: <%= cat ? cat.color : '#ccc' %>"><%= cat ? cat.name : a.badgeCategory %></span></td>
+              <td><strong><%= a.pointsAwarded %></strong></td>
+              <td><%= a.awardedAt %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } %>
+  <% } else if (!progress.categories || progress.categories.length === 0) { %>
+    <div class="empty-state">
+      <strong>No badge progress has been recorded yet.</strong>
+      <p>This live view updates when recognised activity is available from the connected service.</p>
+    </div>
+  <% } else { %>
+    <table class="data-table">
+      <thead><tr><th>Category</th><th>Legacy</th><th>Earned</th><th>Total</th><th>Level</th></tr></thead>
+      <tbody>
+        <% progress.categories.forEach(function(category) { %>
+          <tr>
+            <td><strong><%= category.name %></strong></td>
+            <td><%= category.legacyPoints %></td>
+            <td><%= category.earnedPoints %></td>
+            <td><strong><%= category.points %></strong></td>
+            <td><%= category.currentLevel || '—' %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } %>
+</main>
+<%- include('../partials/footer') %>

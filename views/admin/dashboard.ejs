@@ -1,0 +1,91 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar page-shell">
+  <section class="page-hero">
+    <div class="page-hero-grid">
+      <div class="page-hero-content">
+        <span class="eyebrow">Command Deck</span>
+        <h1>Welcome back, <%= currentUser.displayName %>.</h1>
+        <p class="page-hero-intro">This is your warm start point for the academy. Check the health of the programme, spot where attention is needed, and move straight into the next task without hunting for it.</p>
+        <div class="page-stats">
+          <div class="hero-stat">
+            <span>Centres</span>
+            <strong><%= stats.centres %></strong>
+          </div>
+          <div class="hero-stat">
+            <span>Players</span>
+            <strong><%= stats.players %></strong>
+          </div>
+          <div class="hero-stat">
+            <span>Active Now</span>
+            <strong><%= stats.activePlayers %></strong>
+          </div>
+        </div>
+      </div>
+      <div class="page-hero-panel">
+        <h2>Tonight's priorities</h2>
+        <ul class="page-hero-list">
+          <li>Keep centres and squads tidy so every player lands in the right place.</li>
+          <li>Use modules, challenges, and awards to make progress visible and motivating.</li>
+          <li>Keep parents and players aligned with views that feel calm and trustworthy.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="dashboard-grid">
+    <a href="/centres" class="dash-card">
+      <span class="dash-icon">🏢</span>
+      <span class="dash-count"><%= stats.centres %></span>
+      <span class="dash-label">Centres</span>
+      <span class="dash-sub">Manage each location's setup and readiness.</span>
+    </a>
+    <a href="/groups" class="dash-card">
+      <span class="dash-icon">👥</span>
+      <span class="dash-count"><%= stats.groups %></span>
+      <span class="dash-label">Squads</span>
+      <span class="dash-sub">Shape player groups around games, ages, and centres.</span>
+    </a>
+    <a href="/players" class="dash-card">
+      <span class="dash-icon">🎮</span>
+      <span class="dash-count"><%= stats.players %></span>
+      <span class="dash-label">Players</span>
+      <span class="dash-sub"><%= stats.activePlayers %> active and ready to progress.</span>
+    </a>
+    <a href="/modules" class="dash-card">
+      <span class="dash-icon">📚</span>
+      <span class="dash-count"><%= stats.modules == null ? '—' : stats.modules %></span>
+      <span class="dash-label">Quest Lines</span>
+      <span class="dash-sub">Build the badge journeys players move through.</span>
+    </a>
+    <% if (useMock) { %>
+    <a href="/challenges" class="dash-card">
+      <span class="dash-icon">🏆</span>
+      <span class="dash-count"><%= stats.challenges == null ? '—' : stats.challenges %></span>
+      <span class="dash-label">Challenge Board</span>
+      <span class="dash-sub">Define the moments that turn effort into recognition.</span>
+    </a>
+    <% } %>
+    <a href="/leaderboard" class="dash-card">
+      <span class="dash-icon">🏅</span>
+      <span class="dash-count">&mdash;</span>
+      <span class="dash-label">Leaderboard</span>
+      <span class="dash-sub">See how the whole community is moving.</span>
+    </a>
+    <a href="/progress" class="dash-card">
+      <span class="dash-icon">⭐</span>
+      <span class="dash-count">&mdash;</span>
+      <span class="dash-label">Progress Control</span>
+      <span class="dash-sub">Award challenge wins and review growth at a glance.</span>
+    </a>
+    <% if (currentUser.role === 'SUPER_ADMIN') { %>
+    <a href="/import" class="dash-card">
+      <span class="dash-icon">📥</span>
+      <span class="dash-count">&mdash;</span>
+      <span class="dash-label">Import Console</span>
+      <span class="dash-sub">Bring batches in carefully, preview first, then commit.</span>
+    </a>
+    <% } %>
+  </div>
+</main>
+<%- include('../partials/footer') %>

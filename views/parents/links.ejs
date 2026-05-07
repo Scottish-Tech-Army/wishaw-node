@@ -1,0 +1,68 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar page-shell">
+  <div class="page-header">
+    <div>
+      <h1>👨‍👩‍👧 Family Links</h1>
+      <p>Connect parents and players carefully so families get the right read-only visibility into progress.</p>
+    </div>
+  </div>
+  <%- include('../partials/flash') %>
+
+  <div class="card">
+    <div class="section-heading">
+      <h2>Create a Family Link</h2>
+      <p>Pick the parent and player that belong together, then save the connection.</p>
+    </div>
+    <form method="POST" action="/parents/link" class="form form-inline">
+        <%- include('../partials/csrf') %>
+      <div class="form-group">
+        <label for="parentId">Parent</label>
+        <select id="parentId" name="parentId" required>
+          <option value="">Choose a parent...</option>
+          <% parents.forEach(function(p) { %>
+            <option value="<%= p.id %>"><%= p.displayName %> (<%= p.email %>)</option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="playerId">Player</label>
+        <select id="playerId" name="playerId" required>
+          <option value="">Choose a player...</option>
+          <% players.forEach(function(p) { %>
+            <option value="<%= p.id %>"><%= p.displayName %></option>
+          <% }); %>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Create Family Link</button>
+    </form>
+  </div>
+
+  <% if (links.length === 0) { %>
+    <div class="empty-state">
+      <strong>No family links exist yet.</strong>
+      <p>Create the first link to let families follow progress from a read-only view.</p>
+    </div>
+  <% } else { %>
+    <p class="table-note">Every row below represents a read-only access relationship between a parent account and a player record.</p>
+    <table class="data-table">
+      <thead><tr><th>Parent</th><th>Email</th><th>Player</th><th>Actions</th></tr></thead>
+      <tbody>
+        <% links.forEach(function(l) { %>
+          <tr>
+            <td><%= l.parentName %></td>
+            <td><%= l.parentEmail %></td>
+            <td><%= l.playerName %></td>
+            <td class="actions">
+              <form method="POST" action="/parents/<%= l.id %>/unlink" class="inline-form" onsubmit="return confirm('Remove this link?')">
+                <%- include('../partials/csrf') %>
+                <button type="submit" class="btn btn-sm btn-danger">Remove Link</button>
+              </form>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } %>
+</main>
+<%- include('../partials/footer') %>

@@ -1,0 +1,61 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar page-shell">
+  <div class="page-header">
+    <div>
+      <h1>📚 Quest Lines</h1>
+      <p>Modules are the backbone of progression. Shape each one so the journey feels motivating, readable, and worth completing.</p>
+    </div>
+    <% if (currentUser.role === 'SUPER_ADMIN') { %>
+      <a href="/modules/create" class="btn btn-primary">+ Create Module</a>
+    <% } %>
+  </div>
+  <%- include('../partials/flash') %>
+  <% if (modules.length === 0) { %>
+    <div class="empty-state">
+      <strong>No modules are ready yet.</strong>
+      <p>Create the first badge pathway to turn sessions into a progression players can actually feel.</p>
+    </div>
+  <% } else { %>
+    <p class="table-note">A strong module gives staff a clean structure and gives players a clear reason to keep showing up.</p>
+    <div class="card-grid">
+      <% modules.forEach(function(m) { %>
+        <% var cat = badgeCategories.find(function(c) { return c.id === m.badgeCategory; }); %>
+        <% var borderColor = useMock && cat ? cat.color : '#ccc'; %>
+        <div class="module-card" style="border-left: 4px solid <%= borderColor %>">
+          <div class="module-card-header">
+            <span class="module-icon"><%= useMock ? (cat ? cat.icon : '📦') : '📚' %></span>
+            <h3><%= m.name %></h3>
+          </div>
+          <p class="module-desc"><%= m.description || 'This module is ready for a stronger description.' %></p>
+          <% if (!useMock && m.gameName) { %>
+            <p><strong>Game:</strong> <%= m.gameName %></p>
+          <% } %>
+          <div class="module-meta">
+            <% if (useMock) { %>
+              <span class="badge" style="background: <%= cat ? cat.color : '#ccc' %>"><%= cat ? cat.name : m.badgeCategory %></span>
+              <span><%= m.totalXp %> XP</span>
+            <% } %>
+            <span class="status-badge status-<%= m.active ? 'active' : 'inactive' %>"><%= m.active ? 'Active' : 'Inactive' %></span>
+            <% if (!useMock) { %>
+              <span class="status-badge status-<%= m.approved ? 'active' : 'warning' %>"><%= m.approved ? 'Approved' : 'Pending approval' %></span>
+            <% } %>
+          </div>
+          <div class="module-actions">
+            <% if (currentUser.role === 'SUPER_ADMIN') { %>
+              <a href="/modules/<%= m.id %>/edit" class="btn btn-sm btn-secondary">Edit</a>
+            <% } %>
+            <% if (useMock) { %>
+              <a href="/challenges?moduleId=<%= m.id %>" class="btn btn-sm btn-secondary">View Challenges</a>
+              <form method="POST" action="/modules/<%= m.id %>/delete" class="inline-form" onsubmit="return confirm('Delete this module?')">
+                <%- include('../partials/csrf') %>
+                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+              </form>
+            <% } %>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  <% } %>
+</main>
+<%- include('../partials/footer') %>

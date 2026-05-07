@@ -1,0 +1,63 @@
+<% if (currentUser) { %>
+<%
+  var footerHref = '/';
+  var footerLabel = '🏠 Home Base';
+  var roleTone = 'Keep the programme moving, spot momentum early, and make every session feel well run.';
+  if (currentUser.role === 'PLAYER') {
+    footerHref = '/profile/me';
+    footerLabel = '👤 My Journey';
+    roleTone = 'Your profile is your player card: progress, points, and every badge path in one place.';
+  } else if (currentUser.role === 'PARENT') {
+    footerHref = '/parent/dashboard';
+    footerLabel = '👨‍👩‍👧 Family View';
+    roleTone = 'Follow each session with calm, read-only visibility into your child\'s progress and milestones.';
+  } else if (currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'CENTRE_ADMIN') {
+    footerHref = '/admin/dashboard';
+    footerLabel = '📊 Command Deck';
+    roleTone = 'Shape the programme, guide staff, and keep progression, scheduling, and recognition aligned.';
+  }
+%>
+<nav class="sidebar" aria-label="Main navigation">
+  <div class="sidebar-brand">
+    <span class="brand-icon">🎮</span>
+    <span class="brand-text">Wishaw YMCA<br><small>Esports Academy</small></span>
+  </div>
+  <div class="sidebar-user">
+    <span class="user-name"><%= currentUser.displayName %></span>
+    <span class="user-role badge badge-<%= currentUser.role.toLowerCase() %>"><%= currentUser.role.replace('_', ' ') %></span>
+    <small><%= roleTone %></small>
+  </div>
+  <ul class="nav-links">
+    <% if (currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'CENTRE_ADMIN') { %>
+      <li><a href="/admin/dashboard" class="nav-link">📊 Command Deck</a></li>
+      <li><a href="/centres" class="nav-link">🏢 Centres</a></li>
+      <li><a href="/groups" class="nav-link">👥 Squads</a></li>
+      <li><a href="/players" class="nav-link">🎮 Players</a></li>
+      <li><a href="/modules" class="nav-link">📚 Quest Lines</a></li>
+      <% if (useMock) { %>
+        <li><a href="/parents" class="nav-link">👨‍👩‍👧 Family Links</a></li>
+        <li><a href="/challenges" class="nav-link">🏆 Challenge Board</a></li>
+        <li><a href="/schedule" class="nav-link">📅 Session Map</a></li>
+      <% } %>
+      <li><a href="/progress" class="nav-link">⭐ Progress Control</a></li>
+      <li><a href="/leaderboard" class="nav-link">🏅 Leaderboard</a></li>
+      <% if (currentUser.role === 'SUPER_ADMIN') { %>
+        <li><a href="/import" class="nav-link">📥 Import Console</a></li>
+      <% } %>
+    <% } else if (currentUser.role === 'PLAYER') { %>
+      <li><a href="/profile/me" class="nav-link">👤 My Journey</a></li>
+      <li><a href="/leaderboard" class="nav-link">🏅 Leaderboard</a></li>
+    <% } else if (currentUser.role === 'PARENT') { %>
+      <li><a href="/parent/dashboard" class="nav-link">👨‍👩‍👧 Family View</a></li>
+      <li><a href="/leaderboard" class="nav-link">🏅 Leaderboard</a></li>
+    <% } %>
+  </ul>
+  <div class="sidebar-footer">
+    <a href="<%= footerHref %>" class="nav-link"><%= footerLabel %></a>
+    <form method="POST" action="/logout" class="nav-logout-form">
+      <%- include('csrf') %>
+      <button type="submit" class="nav-link nav-logout nav-link-button">🚪 Sign Out</button>
+    </form>
+  </div>
+</nav>
+<% } %>

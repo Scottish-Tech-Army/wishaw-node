@@ -1,0 +1,167 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar page-shell">
+  <section class="page-hero">
+    <div class="page-hero-grid page-hero-grid-profile">
+      <div class="page-hero-content">
+        <span class="eyebrow">Player Setup</span>
+        <h1><%= player ? 'Shape this player record.' : 'Create a new player record.' %></h1>
+        <p class="page-hero-intro"><%= player ? 'Tidy the player details, then decide whether their uploaded media should act as a square avatar or a fuller profile image.' : 'Start with the core roster details. Once the player exists, you can add profile media that works cleanly across cards, leaderboards, and family views.' %></p>
+        <div class="page-chip-row">
+          <div class="page-chip">
+            <span>Centre</span>
+            <strong><%= player && player.centreName ? player.centreName : 'Set after save' %></strong>
+          </div>
+          <div class="page-chip">
+            <span>Group</span>
+            <strong><%= player && player.groupName ? player.groupName : 'Set after save' %></strong>
+          </div>
+          <div class="page-chip">
+            <span>Media</span>
+            <strong><%= player ? (player.avatarUrl ? 'Avatar ready' : player.imageUrl ? 'Image ready' : 'Not uploaded') : 'Add after create' %></strong>
+          </div>
+        </div>
+      </div>
+      <div class="page-hero-panel player-showcase">
+        <% if (player) { %>
+          <%- include('../partials/player-media', { player: player, size: 'xl', shape: player.profileImageKind === 'avatar' ? 'circle' : 'panel' }) %>
+          <div class="player-showcase-copy">
+            <h2><%= player.displayName %></h2>
+            <p>Media added here will flow through the player journey, staff views, leaderboards, and family-facing pages.</p>
+            <div class="stack-compact">
+              <span class="info-pill"><span>Status</span><strong><%= player.active ? 'Active' : 'Inactive' %></strong></span>
+              <span class="info-pill"><span>Total Points</span><strong><%= player.xp %> XP</strong></span>
+            </div>
+          </div>
+        <% } else { %>
+          <h2>Save first, upload second.</h2>
+          <p>The media tools unlock once the player exists, which keeps the upload flow clean and keeps files tied to a real record.</p>
+          <ul class="page-hero-list">
+            <li>Avatar mode creates a square crop suited to profile chips and rankings.</li>
+            <li>Image mode preserves the wider frame for fuller profile presentation.</li>
+          </ul>
+        <% } %>
+      </div>
+    </div>
+  </section>
+
+  <%- include('../partials/flash') %>
+
+  <section class="card">
+    <div class="section-heading">
+      <h2><%= player ? 'Player Details' : 'New Player Details' %></h2>
+      <p>Keep the core record simple and stable. Username and password are only needed when the live backend is managing access.</p>
+    </div>
+    <form method="POST" action="<%= player ? '/players/' + player.id + '/edit' : '/players/create' %>" class="form">
+      <%- include('../partials/csrf') %>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="displayName">Display Name</label>
+          <input type="text" id="displayName" name="displayName" value="<%= player ? player.displayName : '' %>" required>
+        </div>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" value="<%= player ? (player.username || player.email) : '' %>" <%= player ? 'readonly' : 'required' %>>
+        </div>
+      </div>
+      <% if (!player) { %>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+      <% } %>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="externalRef">External Reference</label>
+          <input type="text" id="externalRef" name="externalRef" value="<%= player ? player.externalRef : '' %>" placeholder="For import mapping">
+          <span class="form-hint">Useful for matching spreadsheet imports or existing academy references.</span>
+        </div>
+        <div class="form-group">
+          <label for="centreId">Centre</label>
+          <select id="centreId" name="centreId" required>
+            <option value="">Select centre...</option>
+            <% centres.forEach(function(c) { %>
+              <option value="<%= c.id %>" <%= player && player.centreId === c.id ? 'selected' : '' %>><%= c.name %></option>
+            <% }); %>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="groupId">Group</label>
+        <select id="groupId" name="groupId" required>
+          <option value="">Select group...</option>
+          <% groups.forEach(function(g) { %>
+            <option value="<%= g.id %>" <%= player && player.groupId === g.id ? 'selected' : '' %>><%= g.name %> (<%= g.centreName %>)</option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary"><%= player ? 'Save Player Changes' : 'Create Player' %></button>
+        <a href="/players" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </section>
+
+  <% if (player) { %>
+    <%
+      var previewLabel = player.displayName || 'Player';
+      var previewInitials = previewLabel.split(/\s+/).filter(Boolean).slice(0, 2).map(function (part) { return part.charAt(0).toUpperCase(); }).join('') || '?';
+      var previewUrl = player.profileImageUrl || '';
+      var previewShape = player.profileImageKind === 'avatar' ? 'circle' : 'panel';
+    %>
+    <section class="card media-upload-card">
+      <div class="section-heading">
+        <h2>Profile Media</h2>
+        <p>Upload once, then choose whether the file should behave like a square avatar or a fuller profile image. Avatar mode is best for leaderboards and compact player cards.</p>
+      </div>
+      <div class="media-upload-grid">
+        <div class="media-preview-card">
+          <div class="player-media player-media-xl player-media-<%= previewShape %><%= previewUrl ? '' : ' is-empty' %>" data-player-media-preview-surface>
+            <img src="<%= previewUrl %>" alt="<%= previewLabel %> media preview" <%= previewUrl ? '' : 'hidden' %> data-current-src="<%= previewUrl %>" data-player-media-preview-image>
+            <span class="player-media-fallback" <%= previewUrl ? 'hidden' : '' %> data-player-media-preview-fallback><%= previewInitials %></span>
+          </div>
+          <div class="media-preview-meta">
+            <span class="eyebrow" data-player-media-preview-status><%= player.profileImageKind === 'avatar' ? 'Avatar mode' : player.profileImageKind === 'image' ? 'Image mode' : 'Ready for upload' %></span>
+            <h3>Preview</h3>
+            <p>If you switch to avatar mode, the browser prepares a square crop before upload. Image mode keeps the wider frame and scales it down if needed.</p>
+            <span class="form-hint" data-player-media-preview-hint><%= player.profileImageKind === 'avatar' ? 'Avatar mode crops the image into a square and resizes it before upload.' : 'Image mode keeps the full frame and scales large files down for a cleaner save.' %></span>
+          </div>
+        </div>
+
+        <form method="POST" action="/players/<%= player.id %>/image?_csrf=<%= encodeURIComponent(csrfToken) %>" enctype="multipart/form-data" class="form media-upload-form" data-player-media-form>
+          <%- include('../partials/csrf') %>
+          <div class="form-group">
+            <label for="mediaFile">Choose Image</label>
+            <input type="file" id="mediaFile" name="mediaFile" accept="image/jpeg,image/png,image/webp,image/gif" required>
+            <span class="form-hint">Accepted formats: JPG, PNG, WebP, GIF. Maximum size: 5 MB.</span>
+          </div>
+          <div class="form-group">
+            <label>How should this file be saved?</label>
+            <div class="radio-card-group">
+              <label class="radio-card">
+                <input type="radio" name="mediaType" value="avatar" checked>
+                <span class="radio-card-title">Save as avatar</span>
+                <span class="radio-card-copy">Best for circular profile chips, leaderboard rows, and compact family cards.</span>
+              </label>
+              <label class="radio-card">
+                <input type="radio" name="mediaType" value="image">
+                <span class="radio-card-title">Save as image</span>
+                <span class="radio-card-copy">Keep the fuller frame for profile presentation while still scaling oversized uploads down.</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" data-player-media-submit>Save Media</button>
+          </div>
+        </form>
+      </div>
+    </section>
+    <script src="/javascripts/player-media-upload.js"></script>
+  <% } else { %>
+    <section class="story-panel story-panel-compact">
+      <h2>Player media comes next.</h2>
+      <p>Create the player first and the media tools will appear here, ready to save either a square avatar or a fuller profile image.</p>
+    </section>
+  <% } %>
+</main>
+<%- include('../partials/footer') %>

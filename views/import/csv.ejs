@@ -1,0 +1,236 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar page-shell">
+  <div class="page-header">
+    <div>
+      <h1>📥 Import Console</h1>
+      <p>Bring data in carefully with preview-first flow, clear validation, and a final commit only when the batch is ready.</p>
+    </div>
+  </div>
+  <%- include('../partials/flash') %>
+
+  <% if (step === 1) { %>
+    <div class="card">
+      <h2>Step 1: Upload the File</h2>
+      <% if (useMock) { %>
+        <p>Upload a CSV file or paste data to preview player imports safely. Expected columns: <code>displayName, externalRef, email, groupId, centreId</code></p>
+      <% } else { %>
+        <p>Upload a points-tracker CSV. The live backend expects at least <code>username</code> and <code>badgeCategoryCode</code>, and can also use <code>challengePoints</code>, <code>legacyPoints</code>, <code>displayName</code>, and <code>externalRef</code>.</p>
+      <% } %>
+      <form method="POST" action="/import/upload?_csrf=<%= encodeURIComponent(csrfToken) %>" enctype="multipart/form-data" class="form">
+        <%- include('../partials/csrf') %>
+        <div class="form-group">
+          <label for="csvFile">CSV File</label>
+          <input type="file" id="csvFile" name="csvFile" accept=".csv">
+        </div>
+        <div class="form-group">
+          <label for="csvText">Or paste CSV data</label>
+          <textarea id="csvText" name="csvText" rows="8" placeholder="<%= useMock ? 'displayName,externalRef,email,groupId,centreId&#10;John Doe,EXT100,john@example.com,1,1' : 'username,badgeCategoryCode,challengePoints,legacyPoints&#10;player1,respect,100,0' %>"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Preview Import Batch</button>
+        </div>
+      </form>
+    </div>
+
+  <% } else if (step === 2) { %>
+    <div class="card">
+      <% if (data.mode === 'live') { %>
+        <h2>Step 2: Review the Backend Preview</h2>
+        <p>Check the validation summary, resolve any unmapped players, and only commit once the batch feels clean.</p>
+        <div class="import-summary">
+          <div class="summary-item summary-created">
+            <span class="summary-count"><%= data.preview.totalRows %></span>
+            <span class="summary-label">Rows</span>
+          </div>
+          <div class="summary-item summary-created">
+            <span class="summary-count"><%= data.preview.validRows %></span>
+            <span class="summary-label">Ready</span>
+          </div>
+          <div class="summary-item summary-updated">
+            <span class="summary-count"><%= data.preview.warningRows %></span>
+            <span class="summary-label">Warnings</span>
+          </div>
+          <div class="summary-item summary-skipped">
+            <span class="summary-count"><%= data.preview.errorRows %></span>
+            <span class="summary-label">Errors</span>
+          </div>
+        </div>
+        <p class="empty-text">
+          <strong>Batch ID:</strong> <%= data.preview.batchId %>
+          <% if (data.preview.fileName) { %>
+            &middot; <strong>File:</strong> <%= data.preview.fileName %>
+          <% } %>
+        </p>
+        <% if (data.preview.errorRows > 0) { %>
+          <div class="flash flash-info">
+            Rows marked <strong>ERROR</strong> will be skipped automatically when the backend commits this batch.
+          </div>
+        <% } %>
+        <% if (data.unmappedPlayers && data.unmappedPlayers.length > 0) { %>
+          <div class="flash flash-info">
+            Map each unresolved username to an existing player account before this batch can be committed.
+          </div>
+          <form method="POST" action="/import/map-players" class="form card import-mapping-card">
+            <%- include('../partials/csrf') %>
+            <input type="hidden" name="batchId" value="<%= data.preview.batchId %>">
+            <div class="mapping-grid">
+              <% data.unmappedPlayers.forEach(function(username, index) { %>
+                <div class="form-group mapping-card">
+                  <label for="mappingValue_<%= index %>"><code><%= username %></code></label>
+                  <input type="hidden" name="mappingKey_<%= index %>" value="<%= username %>">
+                  <select id="mappingValue_<%= index %>" name="mappingValue_<%= index %>">
+                    <option value="">Select existing player...</option>
+                    <% data.playerOptions.forEach(function(player) { %>
+                      <option value="<%= player.id %>" <%= String((data.selectedMappings && data.selectedMappings[username]) || '') === String(player.id) ? 'selected' : '' %>><%= player.label %></option>
+                    <% }); %>
+                  </select>
+                  <small class="form-hint">Live imports only link to existing player accounts.</small>
+                </div>
+              <% }); %>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Save Player Matches</button>
+              <a href="/import" class="btn btn-secondary">Cancel</a>
+            </div>
+          </form>
+        <% } else { %>
+          <div class="flash flash-info">
+            All player references are resolved. You can commit this batch whenever you are ready.
+          </div>
+        <% } %>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Row</th>
+              <th>Username</th>
+              <th>Badge</th>
+              <th>Status</th>
+              <th>Message</th>
+              <th>Raw Data</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% data.rows.forEach(function(row) { %>
+              <tr class="<%= row.status === 'ERROR' ? 'row-error' : (row.status === 'WARNING' ? 'row-update' : 'row-create') %>">
+                <td><%= row.rowNumber %></td>
+                <td><code><%= row.username || '—' %></code></td>
+                <td><%= row.badgeCategoryCode || '—' %></td>
+                <td><span class="status-badge status-<%= row.status === 'ERROR' ? 'error' : (row.status === 'WARNING' ? 'warning' : 'active') %>"><%= row.status %></span></td>
+                <td><%= row.message %></td>
+                <td><code><%= row.rawData %></code></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+        <% if (data.unmappedPlayers && data.unmappedPlayers.length === 0) { %>
+          <form method="POST" action="/import/commit" class="form">
+            <%- include('../partials/csrf') %>
+            <input type="hidden" name="batchId" value="<%= data.preview.batchId %>">
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Commit Import Batch</button>
+              <a href="/import" class="btn btn-secondary">Cancel</a>
+            </div>
+          </form>
+        <% } else { %>
+          <div class="form-actions">
+            <a href="/import" class="btn btn-secondary">Cancel</a>
+          </div>
+        <% } %>
+      <% } else { %>
+        <h2>Step 2: Preview and Validate</h2>
+        <p>Review the parsed data below. Rows with errors will be skipped, so this is the moment to check the batch carefully.</p>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <% data.headers.forEach(function(h) { %>
+                <th><%= h %></th>
+              <% }); %>
+              <th>Validation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% data.rows.forEach(function(row) { %>
+              <tr class="<%= row._errors.length > 0 ? 'row-error' : (row._status === 'UPDATE' ? 'row-update' : 'row-create') %>">
+                <td>
+                  <span class="status-badge status-<%= row._errors.length > 0 ? 'error' : (row._status === 'UPDATE' ? 'warning' : 'active') %>">
+                    <%= row._errors.length > 0 ? 'ERROR' : row._status %>
+                  </span>
+                </td>
+                <% data.headers.forEach(function(h) { %>
+                  <td><%= row[h] || '' %></td>
+                <% }); %>
+                <td>
+                  <% if (row._errors.length > 0) { %>
+                    <span class="text-danger"><%= row._errors.join(', ') %></span>
+                  <% } else if (row._status === 'UPDATE') { %>
+                    <span class="text-warning">Will update existing player</span>
+                  <% } else { %>
+                    <span class="text-success">Will create new player</span>
+                  <% } %>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+        <form method="POST" action="/import/commit" class="form">
+          <%- include('../partials/csrf') %>
+          <input type="hidden" name="rowsJson" value="<%= JSON.stringify(data.rows).replace(/"/g, '&quot;') %>">
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Commit Import</button>
+            <a href="/import" class="btn btn-secondary">Cancel</a>
+          </div>
+        </form>
+      <% } %>
+    </div>
+
+  <% } else if (step === 3) { %>
+    <div class="card">
+      <h2>Step 3: Import Summary</h2>
+      <% if (data.mode === 'live') { %>
+        <div class="import-summary">
+          <div class="summary-item summary-created">
+            <span class="summary-count"><%= data.result.totalAwardsCreated %></span>
+            <span class="summary-label">Awards Created</span>
+          </div>
+          <div class="summary-item summary-updated">
+            <span class="summary-count"><%= data.result.totalPlayersAffected %></span>
+            <span class="summary-label">Players Affected</span>
+          </div>
+          <div class="summary-item summary-updated">
+            <span class="summary-count"><%= data.report.warningRows %></span>
+            <span class="summary-label">Warnings Reviewed</span>
+          </div>
+          <div class="summary-item summary-skipped">
+            <span class="summary-count"><%= data.report.errorRows %></span>
+            <span class="summary-label">Errored Preview Rows</span>
+          </div>
+        </div>
+        <p><strong>Batch ID:</strong> <%= data.result.batchId %></p>
+        <p><strong>Status:</strong> <%= data.result.status %></p>
+        <p><%= data.result.message %></p>
+      <% } else { %>
+        <div class="import-summary">
+          <div class="summary-item summary-created">
+            <span class="summary-count"><%= data.created %></span>
+            <span class="summary-label">Created</span>
+          </div>
+          <div class="summary-item summary-updated">
+            <span class="summary-count"><%= data.updated %></span>
+            <span class="summary-label">Updated</span>
+          </div>
+          <div class="summary-item summary-skipped">
+            <span class="summary-count"><%= data.skipped %></span>
+            <span class="summary-label">Skipped</span>
+          </div>
+        </div>
+      <% } %>
+      <div class="form-actions">
+        <a href="/import" class="btn btn-primary">Run Another Import</a>
+        <a href="/players" class="btn btn-secondary">View Players</a>
+      </div>
+    </div>
+  <% } %>
+</main>
+<%- include('../partials/footer') %>

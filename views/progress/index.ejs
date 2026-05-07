@@ -1,0 +1,67 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar page-shell">
+  <div class="page-header">
+    <div>
+      <h1>⭐ Progress Control</h1>
+      <p>Recognise effort quickly, award the right challenge, and keep every player's growth moving in the open.</p>
+    </div>
+  </div>
+  <%- include('../partials/flash') %>
+
+  <div class="card">
+    <h2>Award a Challenge Win</h2>
+    <p>Choose the achievement, pick the players, and turn that session moment into visible progress straight away.</p>
+    <form method="POST" action="/progress/award" class="form">
+        <%- include('../partials/csrf') %>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="challengeId">Challenge</label>
+          <select id="challengeId" name="challengeId" required>
+            <option value="">Choose a challenge...</option>
+            <% modules.forEach(function(m) { %>
+              <optgroup label="<%= m.name %>">
+                <% challenges.filter(function(c) { return c.moduleId === m.id; }).forEach(function(ch) { %>
+                  <option value="<%= ch.id %>"><%= ch.name %> (<%= ch.points %> pts)</option>
+                <% }); %>
+              </optgroup>
+            <% }); %>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Select Players</label>
+        <div class="checkbox-grid">
+          <% players.filter(function(p) { return p.active; }).forEach(function(p) { %>
+            <label class="checkbox-label">
+              <input type="checkbox" name="playerIds" value="<%= p.id %>">
+              <span><%= p.displayName %> <small>(<%= p.groupName %>)</small></span>
+            </label>
+          <% }); %>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Award Progress</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="section-heading section-divider">
+    <h2>Player Progress Overview</h2>
+    <p>Use this ranked snapshot to see who is climbing, who needs attention, and where recognition is already landing well.</p>
+  </div>
+  <table class="data-table">
+    <thead><tr><th>Player</th><th>Group</th><th>Total XP</th><th>Actions</th></tr></thead>
+    <tbody>
+      <% players.filter(function(p) { return p.active; }).sort(function(a,b) { return b.xp - a.xp; }).forEach(function(p) { %>
+        <tr>
+          <td><%= p.displayName %></td>
+          <td><%= p.groupName %></td>
+          <td><strong><%= p.xp %> XP</strong></td>
+          <td><a href="/progress/player/<%= p.id %>" class="btn btn-sm btn-secondary">View Progress</a></td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</main>
+<%- include('../partials/footer') %>

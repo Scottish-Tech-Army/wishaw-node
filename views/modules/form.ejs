@@ -1,0 +1,61 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar">
+  <div class="page-header">
+    <h1><%= mod ? 'Edit Module' : 'Create Module' %></h1>
+    <a href="/modules" class="btn btn-secondary">← Back</a>
+  </div>
+  <% if (error) { %><div class="flash flash-error"><%= error %></div><% } %>
+  <form method="POST" action="<%= mod ? '/modules/' + mod.id + '/edit' : '/modules/create' %>" class="form card">
+    <%- include('../partials/csrf') %>
+    <div class="form-group">
+      <label for="name">Module Name</label>
+      <input type="text" id="name" name="name" value="<%= mod ? mod.name : '' %>" required>
+    </div>
+    <% if (!useMock) { %>
+      <div class="form-group">
+        <label for="gameName">Game Name</label>
+        <input type="text" id="gameName" name="gameName" value="<%= mod ? (mod.gameName || '') : '' %>" placeholder="Optional game or programme name">
+      </div>
+    <% } %>
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" name="description" rows="3" <%= useMock ? 'required' : '' %>><%= mod ? (mod.description || '') : '' %></textarea>
+    </div>
+    <% if (useMock) { %>
+      <div class="form-group">
+        <label for="badgeCategory">Badge Category</label>
+        <select id="badgeCategory" name="badgeCategory" required>
+          <option value="">Select category...</option>
+          <% badgeCategories.forEach(function(c) { %>
+            <option value="<%= c.id %>" <%= mod && mod.badgeCategory === c.id ? 'selected' : '' %>><%= c.icon %> <%= c.name %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="totalXp">Total XP</label>
+        <input type="number" id="totalXp" name="totalXp" value="<%= mod ? mod.totalXp : 500 %>" min="0">
+      </div>
+      <div class="form-group">
+        <label for="active">Status</label>
+        <select id="active" name="active">
+          <option value="true" <%= mod && mod.active ? 'selected' : '' %>>Active</option>
+          <option value="false" <%= mod && !mod.active ? 'selected' : '' %>>Inactive</option>
+        </select>
+      </div>
+    <% } else if (mod) { %>
+      <div class="form-group">
+        <label>Current Live Status</label>
+        <p>
+          <span class="status-badge status-<%= mod.active ? 'active' : 'inactive' %>"><%= mod.active ? 'Active' : 'Inactive' %></span>
+          <span class="status-badge status-<%= mod.approved ? 'active' : 'warning' %>"><%= mod.approved ? 'Approved' : 'Pending approval' %></span>
+        </p>
+      </div>
+    <% } %>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary"><%= mod ? 'Update Module' : 'Create Module' %></button>
+      <a href="/modules" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</main>
+<%- include('../partials/footer') %>

@@ -1,0 +1,25 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar">
+  <div class="page-header">
+    <h1><%= centre ? 'Edit Centre' : 'Create Centre' %></h1>
+    <a href="/centres" class="btn btn-secondary">← Back</a>
+  </div>
+  <% if (error) { %><div class="flash flash-error"><%= error %></div><% } %>
+  <form method="POST" action="<%= centre ? '/centres/' + centre.id + '/edit' : '/centres/create' %>" class="form card">
+    <%- include('../partials/csrf') %>
+    <div class="form-group">
+      <label for="name">Centre Name</label>
+      <input type="text" id="name" name="name" value="<%= centre ? centre.name : '' %>" required>
+    </div>
+    <div class="form-group">
+      <label for="code">Centre Code</label>
+      <input type="text" id="code" name="code" value="<%= centre ? (centre.code || centre.location) : '' %>" required>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary"><%= centre ? 'Update Centre' : 'Create Centre' %></button>
+      <a href="/centres" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</main>
+<%- include('../partials/footer') %>

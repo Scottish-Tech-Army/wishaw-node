@@ -1,0 +1,79 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar page-shell">
+  <div class="page-header">
+    <div>
+      <h1>🏅 Leaderboard</h1>
+      <p><%= canFilter ? 'Move between global, centre, and squad views to read momentum from every angle.' : 'Global standings are open to every signed-in user, with deeper filters reserved for admin roles.' %></p>
+    </div>
+  </div>
+
+  <% if (canFilter) { %>
+    <form method="GET" action="/leaderboard" class="filter-bar">
+      <select name="scope" onchange="this.form.submit()">
+        <option value="global" <%= selectedScope === 'global' ? 'selected' : '' %>>🌍 Global</option>
+        <option value="centre" <%= selectedScope === 'centre' ? 'selected' : '' %>>🏢 By Centre</option>
+        <option value="group" <%= selectedScope === 'group' ? 'selected' : '' %>>👥 By Group</option>
+      </select>
+      <% if (selectedScope === 'centre') { %>
+        <select name="scopeId" onchange="this.form.submit()">
+          <option value="">Select centre...</option>
+          <% centres.forEach(function(c) { %>
+            <option value="<%= c.id %>" <%= scopeId == c.id ? 'selected' : '' %>><%= c.name %></option>
+          <% }); %>
+        </select>
+      <% } else if (selectedScope === 'group') { %>
+        <select name="scopeId" onchange="this.form.submit()">
+          <option value="">Select group...</option>
+          <% groups.forEach(function(g) { %>
+            <option value="<%= g.id %>" <%= scopeId == g.id ? 'selected' : '' %>><%= g.name %></option>
+          <% }); %>
+        </select>
+      <% } %>
+    </form>
+  <% } else { %>
+    <div class="flash flash-info">
+      Global standings stay visible to players and parents in live mode. Centre and squad filters remain an admin tool.
+    </div>
+  <% } %>
+
+  <% if (entries.length === 0) { %>
+    <div class="empty-state">
+      <strong>No standings are available for this view yet.</strong>
+      <p>Try another filter or wait for more player progress to land in the rankings.</p>
+    </div>
+  <% } else { %>
+      <p class="table-note">Top placements glow first, but every row here reflects work already put in.</p>
+      <table class="data-table leaderboard-table">
+        <thead><tr><th>Rank</th><th>Player</th><th>Group</th><th>Centre</th><th>Points</th></tr></thead>
+        <tbody>
+          <% entries.forEach(function(e) { %>
+            <tr class="<%= e.rank <= 3 ? 'leaderboard-top-' + e.rank : '' %>">
+            <td class="rank-cell">
+              <% if (e.rank === 1) { %>🥇
+              <% } else if (e.rank === 2) { %>🥈
+              <% } else if (e.rank === 3) { %>🥉
+              <% } else { %><%= e.rank %><% } %>
+            </td>
+              <td>
+                <div class="leaderboard-player">
+                  <%- include('../partials/player-media', { player: e, size: 'sm', shape: 'circle' }) %>
+                  <div>
+                    <% if (currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'CENTRE_ADMIN') { %>
+                      <a href="/progress/player/<%= e.playerId %>"><strong><%= e.displayName %></strong></a>
+                    <% } else { %>
+                      <strong><%= e.displayName %></strong>
+                    <% } %>
+                  </div>
+                </div>
+              </td>
+              <td><%= e.groupName %></td>
+              <td><%= e.centreName %></td>
+              <td><strong><%= e.xp %> pts</strong></td>
+            </tr>
+          <% }); %>
+      </tbody>
+    </table>
+  <% } %>
+</main>
+<%- include('../partials/footer') %>

@@ -1,0 +1,60 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+<main id="main-content" class="main-with-sidebar page-shell">
+  <div class="page-header">
+    <div>
+      <h1>🎮 Players</h1>
+      <p>This is the live roster: who is active, where they belong, and how their progress is stacking up.</p>
+    </div>
+    <a href="/players/create" class="btn btn-primary">+ Add Player</a>
+  </div>
+  <%- include('../partials/flash') %>
+  <% if (players.length === 0) { %>
+    <div class="empty-state">
+      <strong>No players have been added yet.</strong>
+      <p>Add the first player to begin tracking progression, awards, and leaderboard movement.</p>
+    </div>
+  <% } else { %>
+      <p class="table-note">Use this view to jump into an individual player record or quickly activate and pause access.</p>
+      <table class="data-table">
+        <thead><tr><th>Name</th><th>Username</th><th>External Ref</th><th>Group</th><th>Centre</th><th>Points</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          <% players.forEach(function(p) { %>
+            <tr class="<%= p.active ? '' : 'row-inactive' %>">
+              <td>
+                <a href="/progress/player/<%= p.id %>" class="player-row-link">
+                  <%- include('../partials/player-media', { player: p, size: 'sm', shape: 'circle' }) %>
+                  <span>
+                    <strong><%= p.displayName %></strong>
+                    <% if (p.avatarUrl || p.imageUrl) { %>
+                      <small class="player-row-meta"><%= p.avatarUrl ? 'Avatar ready' : 'Image ready' %></small>
+                    <% } %>
+                  </span>
+                </a>
+              </td>
+              <td><code><%= p.username || p.email || '—' %></code></td>
+              <td><code><%= p.externalRef %></code></td>
+              <td><%= p.groupName %></td>
+              <td><%= p.centreName %></td>
+              <td><strong><%= p.xp %></strong></td>
+              <td><span class="status-badge status-<%= p.active ? 'active' : 'inactive' %>"><%= p.active ? 'Active' : 'Inactive' %></span></td>
+              <td class="actions">
+                <a href="/players/<%= p.id %>/edit" class="btn btn-sm btn-secondary">Edit</a>
+                <form method="POST" action="/players/<%= p.id %>/toggle" class="inline-form">
+                  <%- include('../partials/csrf') %>
+                  <button type="submit" class="btn btn-sm btn-<%= p.active ? 'warning' : 'success' %>"><%= p.active ? 'Deactivate' : 'Activate' %></button>
+                </form>
+                <% if (useMock) { %>
+                  <form method="POST" action="/players/<%= p.id %>/delete" class="inline-form" onsubmit="return confirm('Delete this player?')">
+                    <%- include('../partials/csrf') %>
+                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                  </form>
+                <% } %>
+              </td>
+            </tr>
+          <% }); %>
+      </tbody>
+    </table>
+  <% } %>
+</main>
+<%- include('../partials/footer') %>
